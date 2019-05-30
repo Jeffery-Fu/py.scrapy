@@ -28,7 +28,7 @@ def main():
 if __name__ == '__main__' :
     main()
     
-## 第二轮（解析）
+##第二轮（解析）
 import requests
 from requests.exceptions import RequestException
 import re
@@ -60,7 +60,7 @@ def parse_one_page(html):
      print(items)
      #[( ),( ),( )] 
  
- ## 第三轮（重新整理，将数据放到字典中）
+##第三轮（重新整理，将数据放到字典中）
 import requests
 from requests.exceptions import RequestException
 import re
@@ -103,8 +103,59 @@ def parse_one_page(html):
     
 if __name__ == '__main__' :
     main()     
+
+##第四轮（将整理的数据以字典的形式写入文件）
+import requests
+from requests.exceptions import RequestException
+import re
+import json
+
+def get_one_page(url):
+    try:
+        response = requests.get(url)
+    # 判断请求结果，（状态码）
+        if response.status_code == 200:
+            return response.text
+        return None
+    except RequestException:
+        return None
         
- ## 第五轮 （对写入的文件进行解码）
+def write_to_file(content):
+    with open('E:/user/resuly.txt','a') as f:
+        f.write(json.dumps(content) +'\n')
+        
+def  parse_one_page(html):
+    pattern = re.compile(r'<i.*?board-index.*?">(\d+)</i>'
+                          '.*?data-src="(.*?)"'
+                          '.*?<p class="name"><a'+'.*?title=.*?>(.*?)</a>'
+                          '.*?star">(.*?)</p>'
+                          '.*?class="releasetime">(.*?)</p>'
+                          '.*?class="integer">(.*?)</i>'
+                          '.*?class="fraction">(.*?)</i>',re.S)
+    
+    items = re.findall(pattern,html) 
+                                    #(匹配的正则， 匹配的文本)
+    for i in items:
+        yield  {
+            'index' : i[0],
+            'image': i[1],
+            'title' : i[2],
+            'actor' : i[3].strip()[3:],
+            'time' : i[4].strip()[5:],
+            'score' : i[5] +i[6]          
+        }
+
+def main():
+    url = 'https://maoyan.com/board/4'
+    html = get_one_page(url)
+    for item in parse_one_page(html):
+        print(item)
+        write_to_file(item)
+
+if __name__ == '__main__' :
+    main()
+
+##第五轮 （对写入的文件进行解码）
 import requests
 from requests.exceptions import RequestException
 import re
@@ -155,7 +206,7 @@ def main():
 if __name__ == '__main__' :
     main()   
     
-## 第六轮（广义化）
+##第六轮（广义化）
 import requests
 from requests.exceptions import RequestException
 import re
