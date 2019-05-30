@@ -1,2 +1,3 @@
 # py.scrapy
-recording some codes in learing data scrapy
+
+a newbid,recoding some codes in learning data
